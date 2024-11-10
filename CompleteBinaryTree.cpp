@@ -1,10 +1,49 @@
 #include "CompleteBinaryTree.h"
-#include "Queue.h"  // Подключаем шаблонную очередь
+#include "Queue.h" 
 #include <iostream>
 
-// Инициализация дерева
 CompleteBinaryTree* initialize() {
-    return nullptr;  // Возвращаем пустое дерево
+    return nullptr;
+}
+
+bool isComplete(CompleteBinaryTree* root) {
+    if (root == nullptr) return true;  // Пустое дерево считается полным
+
+    Queue<CompleteBinaryTree*> q;
+    q.initialize();
+    q.push(root);
+
+    bool foundNonFullNode = false;  // Флаг, который указывает, что мы нашли неполный узел
+
+    while (!q.is_empty()) {
+        CompleteBinaryTree* current = q.front_elem();
+        q.pop();
+
+        // Проверяем левый дочерний узел
+        if (current->left) {
+            if (foundNonFullNode) {
+                q.cleanup();
+                return false;  // Если уже был найден неполный узел, дерево не полное
+            }
+            q.push(current->left);
+        } else {
+            foundNonFullNode = true;  // Если нет левого узла, устанавливаем флаг
+        }
+
+        // Проверяем правый дочерний узел
+        if (current->right) {
+            if (foundNonFullNode) {
+                q.cleanup();
+                return false;  // Если уже был найден неполный узел, дерево не полное
+            }
+            q.push(current->right);
+        } else {
+            foundNonFullNode = true;  // Если нет правого узла, устанавливаем флаг
+        }
+    }
+
+    q.cleanup();
+    return true;  // Если все условия выполнены, дерево полное
 }
 
 // Вставка элемента в полное бинарное дерево

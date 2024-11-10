@@ -13,7 +13,8 @@ struct CompleteBinaryTree {
 };
 
 // Функции для работы с полным бинарным деревом
-CompleteBinaryTree* initialize();                        // Инициализация дерева
+CompleteBinaryTree* initialize();
+bool isComplete(CompleteBinaryTree* root);                        // Инициализация дерева
 void insert(CompleteBinaryTree*& root, int value);       // Вставка элемента
 bool find(CompleteBinaryTree* root, int value);          // Поиск элемента
 void remove(CompleteBinaryTree*& root, int value);       // Удаление элемента

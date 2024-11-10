@@ -19,3 +19,9 @@ Inserted 30 into tree Tree
 Added 10 to queue queue
 Added 16 to queue queue
 Popped from queue queue
+Inserted 10 into tree Tree
+Inserted 30 into tree Tree
+Inserted 60 into tree Tree
+Deleted 30 from tree Tree
+Complete is 1Deleted 60 from tree Tree
+Complete is 1Inserted 1701147252 into tree Tree

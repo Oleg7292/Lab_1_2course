@@ -339,7 +339,7 @@ void processQuery(const string& query, ofstream& outputFile) {
         iss >> value;
         int idx = findOrCreate(treeNames, trees, name);
         remove(trees[idx], value);
-        outputFile << "Deleted " << value << " from tree " << name << endl;
+        outputFile << "Deleted " << value << " from tree " << name << endl << "Complete is " << isComplete(trees[idx]) << endl;
 
     } else if (operation == "TGET") {
         int value;
