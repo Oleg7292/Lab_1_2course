@@ -1,25 +1,25 @@
 #ifndef DOUBLYLINKEDLIST_H
 #define DOUBLYLINKEDLIST_H
 
-// Структура узла двусвязного списка
+#include <string>
+
+using namespace std;
+
 struct DoublyNode {
-    int data;
+    string data;
     DoublyNode* prev;
     DoublyNode* next;
 };
 
-// Двусвязный список
 struct DoublyLinkedList {
     DoublyNode* head;
     DoublyNode* tail;
 
     void initialize();
-    void push_front(int value);
-    void push_back(int value);
-    void remove(int value);
+    void push_front(const string& value);
+    void push_back(const string& value);
+    void remove(const string& value);
     void cleanup();
-    void print_forward() const;
-    void print_backward() const;
 };
 
 #endif

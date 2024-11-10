@@ -2,21 +2,29 @@
 #define HASHTABLE_H
 
 #include <string>
+#include <iostream>
+#include <stdexcept>
+
+using namespace std;
 
 struct HashNode {
-    std::string key;
-    int value;
+    string key;
+    string value;
     HashNode* next;
 };
 
 struct HashTable {
-    HashNode* table[10];
+    HashNode** table;  // Указатель на массив указателей
+    int size;          // Размер таблицы
+
+    HashTable(int size = 10);
+    ~HashTable();
 
     void initialize();
-    int hashFunction(const std::string& key);
-    void insert(const std::string& key, int value);
-    int get(const std::string& key);
-    void remove(const std::string& key);
+    int hashFunction(const string& key);
+    void insert(const string& key, const string& value);
+    string get(const string& key);
+    void remove(const string& key);
     void cleanup();
 };
 

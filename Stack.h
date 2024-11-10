@@ -1,18 +1,22 @@
 #ifndef STACK_H
 #define STACK_H
 
-#include <cstddef>
+#include <string>
+
+using namespace std;
+
+struct StackNode {  // Переименовано
+    string data;
+    StackNode* next;  // Указатель на следующий узел
+};
 
 struct Stack {
-    int* data;
-    size_t top;
-    size_t capacity;
+    StackNode* top;  // Указатель на вершину стека
 
-    void initialize(size_t initialCapacity = 2);
-    void resize();
-    void push(int value);
-    int pop();
-    int top_elem() const;
+    void initialize();
+    void push(const string& value);
+    void pop();
+    string top_elem() const;
     void cleanup();
 };
 

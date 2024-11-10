@@ -2,44 +2,40 @@
 #include <iostream>
 #include <stdexcept>
 
-void Stack::initialize(size_t initialCapacity) {
-    capacity = initialCapacity;
-    top = 0;
-    data = new int[capacity];
+using namespace std;
+
+void Stack::initialize() {
+    top = nullptr;
 }
 
-void Stack::resize() {
-    capacity *= 2;
-    int* newData = new int[capacity];
-    for (size_t i = 0; i < top; ++i) {
-        newData[i] = data[i];
-    }
-    delete[] data;
-    data = newData;
+void Stack::push(const string& value) {
+    StackNode* newStackNode = new StackNode;
+    newStackNode->data = value;
+    newStackNode->next = top;
+    top = newStackNode;  // Новый элемент становится вершиной стека
 }
 
-void Stack::push(int value) {
-    if (top >= capacity) {
-        resize();
+void Stack::pop() {
+    if (!top) {
+        cerr << "Stack underflow\n";
+        return;
     }
-    data[top++] = value;
+    StackNode* toDelete = top;
+    top = top->next;  // Сдвигаем вершину вниз
+    delete toDelete;  // Удаляем старую вершину
 }
 
-int Stack::pop() {
-    if (top == 0) {
-        throw std::out_of_range("Stack underflow");
+string Stack::top_elem() const {
+    if (!top) {
+        throw out_of_range("Stack is empty");
     }
-    return data[--top];  // Уменьшаем top и возвращаем элемент
-}
-
-
-int Stack::top_elem() const {
-    if (top == 0) {
-        throw std::out_of_range("Stack is empty");
-    }
-    return data[top - 1];
+    return top->data;  // Возвращаем строку из вершины стека
 }
 
 void Stack::cleanup() {
-    delete[] data;
+    while (top) {
+        StackNode* toDelete = top;
+        top = top->next;
+        delete toDelete;
+    }
 }

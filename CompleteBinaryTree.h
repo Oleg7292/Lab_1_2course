@@ -1,17 +1,21 @@
 #ifndef COMPLETEBINARYTREE_H
 #define COMPLETEBINARYTREE_H
 
-struct CompleteBinaryTree {
-    int* nodes;
-    int capacity;
-    int size;
+#include <iostream>
+using namespace std;
 
-    void initialize(int initialCapacity = 10);
-    void resize();
-    void insert(int value);
-    bool isComplete() const;
-    void print() const;
-    void cleanup();
+struct CompleteBinaryTree {
+    int value;
+    CompleteBinaryTree* left;
+    CompleteBinaryTree* right;
+
+    CompleteBinaryTree(int val) : value(val), left(nullptr), right(nullptr) {}
 };
+
+// Функции для работы с полным бинарным деревом
+CompleteBinaryTree* initialize();                        // Инициализация дерева
+void insert(CompleteBinaryTree*& root, int value);       // Вставка элемента
+bool find(CompleteBinaryTree* root, int value);          // Поиск элемента
+void remove(CompleteBinaryTree*& root, int value);       // Удаление элемента
 
 #endif

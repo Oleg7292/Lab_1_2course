@@ -1,51 +1,60 @@
- #include "HashTable.h"
-#include <iostream>
-#include <stdexcept>
+#include "HashTable.h"
+
+HashTable::HashTable(int size) : size(size) {
+    table = new HashNode*[size];
+    initialize();
+}
+
+HashTable::~HashTable() {
+    cleanup();
+    delete[] table;
+}
 
 void HashTable::initialize() {
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < size; ++i) {
         table[i] = nullptr;
     }
 }
 
-int HashTable::hashFunction(const std::string& key) {
+int HashTable::hashFunction(const string& key) {
     int hash = 0;
     for (char ch : key) {
         hash += ch;
     }
-    return hash % 10;
+    return hash % size;
 }
 
-void HashTable::insert(const std::string& key, int value) {
-    int index = hashFunction(key);
-    HashNode* newNode = new HashNode{key, value, nullptr};
-    
-    if (table[index] == nullptr) {
-        table[index] = newNode;
-    } else {
-        HashNode* temp = table[index];
-        while (temp->next != nullptr) {
-            temp = temp->next;
-        }
-        temp->next = newNode;
-    }
-}
-
-int HashTable::get(const std::string& key) {
+void HashTable::insert(const string& key, const string& value) {
     int index = hashFunction(key);
     HashNode* temp = table[index];
-    
+
+    while (temp != nullptr) {
+        if (temp->key == key) {
+            temp->value = value;  // Обновление значения
+            return;
+        }
+        temp = temp->next;
+    }
+
+    HashNode* newNode = new HashNode{key, value, table[index]};
+    table[index] = newNode;  // Вставка в начало списка
+}
+
+string HashTable::get(const string& key) {
+    int index = hashFunction(key);
+    HashNode* temp = table[index];
+
     while (temp != nullptr) {
         if (temp->key == key) {
             return temp->value;
         }
         temp = temp->next;
     }
-    
-    throw std::out_of_range("Key not found");
+
+    throw out_of_range("Key not found");
 }
 
-void HashTable::remove(const std::string& key) {
+void HashTable::remove(const string& key) {
     int index = hashFunction(key);
     HashNode* temp = table[index];
     HashNode* prev = nullptr;
@@ -56,7 +65,7 @@ void HashTable::remove(const std::string& key) {
     }
 
     if (temp == nullptr) {
-        std::cerr << "Key not found\n";
+        cerr << "Key not foundn";
         return;
     }
 
@@ -70,12 +79,13 @@ void HashTable::remove(const std::string& key) {
 }
 
 void HashTable::cleanup() {
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < size; ++i) {
         HashNode* temp = table[i];
         while (temp != nullptr) {
             HashNode* toDelete = temp;
             temp = temp->next;
             delete toDelete;
         }
+        table[i] = nullptr;  // Обнуление указателя
     }
 }

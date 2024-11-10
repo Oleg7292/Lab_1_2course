@@ -1,18 +1,22 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
-struct Node {
-    int data;
-    Node* next;
+#include <string>
+
+using namespace std;
+
+struct ListNode {  // Переименовано
+    string data;
+    ListNode* next;
 };
 
 struct LinkedList {
-    Node* head;
+    ListNode* head;
 
     void initialize();
-    void push_front(int value);
-    void push_back(int value);
-    void remove(int value);
+    void push_front(const string& value);
+    void push_back(const string& value);
+    void remove(const string& value);
     void cleanup();
 };
 

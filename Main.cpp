@@ -3,163 +3,399 @@
 #include <sstream>
 #include <string>
 
-// Подключаем все структуры данных
 #include "Array.h"
 #include "LinkedList.h"
-#include "DoublyLinkedList.h"  // Двусвязный список
+#include "DoublyLinkedList.h"
 #include "Stack.h"
 #include "Queue.h"
 #include "HashTable.h"
-#include "CompleteBinaryTree.h"
+#include "CompleteBinaryTree.h"  // Подключаем заголовок полного бинарного дерева
 
-// Функция для обработки команды
-void processCommand(const std::string& command, Array& array, LinkedList& list, DoublyLinkedList& dlist, Stack& stack, Queue& queue, HashTable& ht, CompleteBinaryTree& tree) {
-    std::istringstream iss(command);
-    std::string action, structure;
-    iss >> structure >> action;
-    
-    if (structure == "M") { // Операции с массивом
-        if (action == "PUSH") {
-            int value;
-            iss >> value;
-            array.add(value);
-        } else if (action == "GET") {
-            int index;
-            iss >> index;
-            std::cout << "Array element at index " << index << ": " << array.get(index) << std::endl;
-        } else if (action == "DEL") {
-            int index;
-            iss >> index;
-            array.removeAt(index);
+using namespace std;
+
+const int MAX_STRUCTS = 100;  // Максимальное количество разных структур каждого типа
+
+// Массивы указателей для хранения структур данных
+Stack* stacks[MAX_STRUCTS] = { nullptr };
+Queue<string>* queues[MAX_STRUCTS] = { nullptr };
+HashTable* hashTables[MAX_STRUCTS] = { nullptr };
+Array* arrays[MAX_STRUCTS] = { nullptr };
+LinkedList* linkedLists[MAX_STRUCTS] = { nullptr };
+DoublyLinkedList* doublyLinkedLists[MAX_STRUCTS] = { nullptr };
+CompleteBinaryTree* trees[MAX_STRUCTS] = { nullptr };  // Массив указателей на корни деревьев
+string stackNames[MAX_STRUCTS], queueNames[MAX_STRUCTS], hashTableNames[MAX_STRUCTS], arrayNames[MAX_STRUCTS], linkedListNames[MAX_STRUCTS], doublyLinkedListNames[MAX_STRUCTS], treeNames[MAX_STRUCTS];
+
+// Функция поиска и создания структуры данных
+template<typename T>
+int findOrCreate(string* names, T** structs, const string& name) {
+    for (int i = 0; i < MAX_STRUCTS; i++) {
+        if (names[i] == name) {
+            return i;  // Найден существующий элемент
         }
-    }
-    else if (structure == "L") { // Операции с односвязным списком
-        if (action == "PUSH") {
-            int value;
-            iss >> value;
-            list.push_back(value);
-        } else if (action == "DEL") {
-            int value;
-            iss >> value;
-            list.remove(value);
-        }
-    }
-    else if (structure == "DL") { // Операции с двусвязным списком
-        if (action == "PUSH_FRONT") {
-            int value;
-            iss >> value;
-            dlist.push_front(value);
-        } else if (action == "PUSH_BACK") {
-            int value;
-            iss >> value;
-            dlist.push_back(value);
-        } else if (action == "DEL") {
-            int value;
-            iss >> value;
-            dlist.remove(value);
-        }
-    }
-    else if (structure == "S") { // Операции со стеком
-        if (action == "PUSH") {
-            int value;
-            iss >> value;
-            stack.push(value);
-        } else if (action == "POP") {
-            stack.pop();
-        }
-    }
-    else if (structure == "Q") { // Операции с очередью
-        if (action == "PUSH") {
-            int value;
-            iss >> value;
-            queue.push(value);
-        } else if (action == "POP") {
-            queue.pop();
-        }
-    }
-    else if (structure == "H") { // Операции с хэш-таблицей
-        if (action == "SET") {
-            std::string key;
-            int value;
-            iss >> key >> value;
-            ht.insert(key, value);
-        } else if (action == "GET") {
-            std::string key;
-            iss >> key;
-            std::cout << "HashTable value for key " << key << ": " << ht.get(key) << std::endl;
-        } else if (action == "DEL") {
-            std::string key;
-            iss >> key;
-            ht.remove(key);
-        }
-    }
-    else if (structure == "T") { // Операции с деревом
-        if (action == "INSERT") {
-            int value;
-            iss >> value;
-            tree.insert(value);
-        } else if (action == "CHECK_COMPLETE") {
-            if (tree.isComplete()) {
-                std::cout << "The tree is complete!" << std::endl;
+        if (names[i].empty()) {  // Пустая ячейка
+            names[i] = name;
+            if constexpr (is_same<T, CompleteBinaryTree>::value) {
+                structs[i] = nullptr;  // Для дерева оставляем корень пустым (nullptr)
             } else {
-                std::cout << "The tree is not complete." << std::endl;
+                structs[i] = new T();  // Для остальных структур — стандартная инициализация
+                structs[i]->initialize();
+            }
+            return i;
+        }
+    }
+    throw runtime_error("Exceeded maximum structures allowed.");
+}
+
+
+
+// Считывание данных из файла
+void loadFromFile(const string& fileName) {
+    ifstream inputFile(fileName);
+    string line;
+
+    if (inputFile.is_open()) {
+        while (getline(inputFile, line)) {
+            istringstream iss(line);
+            string type, name;
+            iss >> type >> name;
+
+            if (type == "stack") {
+                int idx = findOrCreate(stackNames, stacks, name);
+                string value;
+                while (iss >> value) {
+                    stacks[idx]->push(value);
+                }
+            } else if (type == "queue") {
+                int idx = findOrCreate(queueNames, queues, name);
+                string value;
+                while (iss >> value) {
+                    queues[idx]->push(value);
+                }
+            } else if (type == "hashtable") {
+                int idx = findOrCreate(hashTableNames, hashTables, name);
+                string keyValue;
+                while (iss >> keyValue) {
+                    size_t eqPos = keyValue.find('=');
+                    string key = keyValue.substr(0, eqPos);
+                    string value = keyValue.substr(eqPos + 1);
+                    hashTables[idx]->insert(key, value);
+                }
+            } else if (type == "array") {
+                int idx = findOrCreate(arrayNames, arrays, name);
+                string value;
+                while (iss >> value) {
+                    arrays[idx]->add(value);
+                }
+            } else if (type == "linkedlist") {
+                int idx = findOrCreate(linkedListNames, linkedLists, name);
+                string value;
+                while (iss >> value) {
+                    linkedLists[idx]->push_back(value);
+                }
+            } else if (type == "doublylist") {
+                int idx = findOrCreate(doublyLinkedListNames, doublyLinkedLists, name);
+                string value;
+                while (iss >> value) {
+                    doublyLinkedLists[idx]->push_back(value);
+                }
+            } else if (type == "tree") {
+                int idx = findOrCreate(treeNames, trees, name);
+                int value;
+
+                // Если дерево еще не создано, инициализируем корень
+                if (trees[idx] == nullptr && iss >> value) {
+                    trees[idx] = new CompleteBinaryTree(value);
+                }
+                // Добавляем оставшиеся узлы
+                while (iss >> value) {
+                    insert(trees[idx], value);
+                }
             }
         }
-    }
-}
-
-// Чтение команд из файла
-void processFile(const std::string& filename, Array& array, LinkedList& list, DoublyLinkedList& dlist, Stack& stack, Queue& queue, HashTable& ht, CompleteBinaryTree& tree) {
-    std::ifstream file(filename);
-    std::string line;
-    if (file.is_open()) {
-        while (std::getline(file, line)) {
-            processCommand(line, array, list, dlist, stack, queue, ht, tree);
-        }
+        inputFile.close();
     } else {
-        std::cerr << "Unable to open file: " << filename << std::endl;
+        cerr << "Unable to open file for loading: " << fileName << endl;
     }
 }
 
+// Сохранение данных в файл
+void saveToFile(const string& fileName) {
+    ofstream outputFile(fileName);
+    if (!outputFile.is_open()) {
+        cerr << "Unable to open file for saving: " << fileName << endl;
+        return;
+    }
+
+    for (int i = 0; i < MAX_STRUCTS; i++) {
+        if (!stackNames[i].empty()) {
+            outputFile << "stack " << stackNames[i];
+            Stack temp = *stacks[i];
+            while (temp.top != nullptr) {
+                outputFile << " " << temp.top_elem();
+                temp.pop();
+            }
+            outputFile << endl;
+        }
+        if (!queueNames[i].empty()) {
+            outputFile << "queue " << queueNames[i];
+            Queue<string> temp = *queues[i];
+            while (temp.head != nullptr) {
+                outputFile << " " << temp.front_elem();
+                temp.pop();
+            }
+            outputFile << endl;
+        }
+        if (!hashTableNames[i].empty()) {
+            outputFile << "hashtable " << hashTableNames[i];
+            for (int j = 0; j < hashTables[i]->size; ++j) {
+                HashNode* node = hashTables[i]->table[j];
+                while (node != nullptr) {
+                    outputFile << " " << node->key << "=" << node->value;
+                    node = node->next;
+                }
+            }
+            outputFile << endl;
+        }
+        if (!arrayNames[i].empty()) {
+            outputFile << "array " << arrayNames[i];
+            for (size_t j = 0; j < arrays[i]->length; ++j) {
+                outputFile << " " << arrays[i]->get(j);
+            }
+            outputFile << endl;
+        }
+        if (!linkedListNames[i].empty()) {
+            outputFile << "linkedlist " << linkedListNames[i];
+            ListNode* temp = linkedLists[i]->head;
+            while (temp != nullptr) {
+                outputFile << " " << temp->data;
+                temp = temp->next;
+            }
+            outputFile << endl;
+        }
+        if (!doublyLinkedListNames[i].empty()) {
+            outputFile << "doublylist " << doublyLinkedListNames[i];
+            DoublyNode* temp = doublyLinkedLists[i]->head;
+            while (temp != nullptr) {
+                outputFile << " " << temp->data;
+                temp = temp->next;
+            }
+            outputFile << endl;
+        }
+        if (!treeNames[i].empty()) {
+            outputFile << "tree " << treeNames[i];
+            if (trees[i] != nullptr) {
+                queue<CompleteBinaryTree*> q;
+                q.push(trees[i]);
+
+                while (!q.empty()) {
+                    CompleteBinaryTree* node = q.front();
+                    q.pop();
+                    outputFile << " " << node->value;
+
+                    if (node->left) q.push(node->left);
+                    if (node->right) q.push(node->right);
+                }
+            }
+            outputFile << endl;
+        }
+    }
+    outputFile.close();
+}
+
+
+// Обработка запроса
+void processQuery(const string& query, ofstream& outputFile) {
+    istringstream iss(query);
+    string operation, name;
+    iss >> operation >> name;
+
+    if (operation == "SPUSH") {
+        string value;
+        iss >> value;
+        int idx = findOrCreate(stackNames, stacks, name);
+        stacks[idx]->push(value);
+        outputFile << "Added " << value << " to stack " << name << endl;
+
+    } else if (operation == "SPOP") {
+        int idx = findOrCreate(stackNames, stacks, name);
+        stacks[idx]->pop();
+        outputFile << "Popped from stack " << name << endl;
+
+    } else if (operation == "QPUSH") {
+        string value;
+        iss >> value;
+        int idx = findOrCreate(queueNames, queues, name);
+        queues[idx]->push(value);
+        outputFile << "Added " << value << " to queue " << name << endl;
+
+    } else if (operation == "QPOP") {
+        int idx = findOrCreate(queueNames, queues, name);
+        queues[idx]->pop();
+        outputFile << "Popped from queue " << name << endl;
+
+    } else if (operation == "HSET") {
+        string key, value;
+        iss >> key >> value;
+        int idx = findOrCreate(hashTableNames, hashTables, name);
+        hashTables[idx]->insert(key, value);
+        outputFile << "Set key " << key << " with value " << value << " in hash table " << name << endl;
+
+    } else if (operation == "HGET") {
+        string key;
+        iss >> key;
+        int idx = findOrCreate(hashTableNames, hashTables, name);
+        try {
+            string value = hashTables[idx]->get(key);
+            outputFile << "Value for key " << key << " in hash table " << name << ": " << value << endl;
+        } catch (const out_of_range&) {
+            outputFile << "Key " << key << " not found in hash table " << name << endl;
+        }
+
+    } else if (operation == "HDEL") {
+        string key;
+        iss >> key;
+        int idx = findOrCreate(hashTableNames, hashTables, name);
+        hashTables[idx]->remove(key);
+        outputFile << "Deleted key " << key << " from hash table " << name << endl;
+
+    } else if (operation == "MPUSH") {
+        string value;
+        iss >> value;
+        int idx = findOrCreate(arrayNames, arrays, name);
+        arrays[idx]->add(value);
+        outputFile << "Added " << value << " to array " << name << endl;
+
+    } else if (operation == "MGET") {
+        size_t index;
+        iss >> index;
+        int idx = findOrCreate(arrayNames, arrays, name);
+        try {
+            string value = arrays[idx]->get(index);
+            outputFile << "Array element at index " << index << ": " << value << endl;
+        } catch (const out_of_range&) {
+            outputFile << "Index out of range for array " << name << endl;
+        }
+
+    } else if (operation == "MDEL") {
+        size_t index;
+        iss >> index;
+        int idx = findOrCreate(arrayNames, arrays, name);
+        arrays[idx]->removeAt(index);
+        outputFile << "Deleted element at index " << index << " from array " << name << endl;
+
+    } else if (operation == "LLPUSH") {
+        string value;
+        iss >> value;
+        int idx = findOrCreate(linkedListNames, linkedLists, name);
+        linkedLists[idx]->push_back(value);
+        outputFile << "Added " << value << " to linked list " << name << endl;
+
+    } else if (operation == "LLREMOVE") {
+        string value;
+        iss >> value;
+        int idx = findOrCreate(linkedListNames, linkedLists, name);
+        linkedLists[idx]->remove(value);
+        outputFile << "Removed " << value << " from linked list " << name << endl;
+
+    } else if (operation == "DLADD_FRONT") {
+        string value;
+        iss >> value;
+        int idx = findOrCreate(doublyLinkedListNames, doublyLinkedLists, name);
+        doublyLinkedLists[idx]->push_front(value);
+        outputFile << "Added " << value << " to front of doubly linked list " << name << endl;
+
+    } else if (operation == "DLADD_BACK") {
+        string value;
+        iss >> value;
+        int idx = findOrCreate(doublyLinkedListNames, doublyLinkedLists, name);
+        doublyLinkedLists[idx]->push_back(value);
+        outputFile << "Added " << value << " to back of doubly linked list " << name << endl;
+
+    } else if (operation == "DLREMOVE") {
+        string value;
+        iss >> value;
+        int idx = findOrCreate(doublyLinkedListNames, doublyLinkedLists, name);
+        doublyLinkedLists[idx]->remove(value);
+        outputFile << "Removed " << value << " from doubly linked list " << name << endl;
+
+    } else if (operation == "TINSERT") {
+        int value;
+        iss >> value;
+        
+        // Находим индекс дерева или создаем его
+        int idx = findOrCreate(treeNames, trees, name);
+        
+        // Если дерево не существует, создаем корневой элемент
+        if (trees[idx] == nullptr) {
+            trees[idx] = new CompleteBinaryTree(value);
+        } else {
+            insert(trees[idx], value);  // Вставляем элемент в существующее дерево
+        }
+        
+        outputFile << "Inserted " << value << " into tree " << name << endl;
+
+    } else if (operation == "TDEL") {
+        int value;
+        iss >> value;
+        int idx = findOrCreate(treeNames, trees, name);
+        remove(trees[idx], value);
+        outputFile << "Deleted " << value << " from tree " << name << endl;
+
+    } else if (operation == "TGET") {
+        int value;
+        iss >> value;
+        int idx = findOrCreate(treeNames, trees, name);
+        bool found = find(trees[idx], value);
+        if (found) {
+            outputFile << "Value " << value << " found in tree " << name << endl;
+        } else {
+            outputFile << "Value " << value << " not found in tree " << name << endl;
+        }
+    }
+}
+
+// Основная функция
 int main(int argc, char* argv[]) {
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <file_with_commands>" << std::endl;
+    if (argc < 3 || argc > 5) {
+        cerr << "Usage: " << argv[0] << " --file <file.data> [--query '<query>']" << endl;
         return 1;
     }
 
-    // Инициализация структур данных
-    Array array;
-    array.initialize();
-    
-    LinkedList list;
-    list.initialize();
+    string fileArg = argv[1];
+    string fileName = argv[2];
+    string queryArg = argc == 5 ? argv[3] : "";
+    string query = argc == 5 ? argv[4] : "";
 
-    DoublyLinkedList dlist;
-    dlist.initialize();
+    if (fileArg != "--file" || (argc == 5 && queryArg != "--query")) {
+        cerr << "Invalid arguments. Usage: " << argv[0] << " --file <file.data> [--query '<query>']" << endl;
+        return 1;
+    }
 
-    Stack stack;
-    stack.initialize();
-    
-    Queue queue;
-    queue.initialize();
+    // Загружаем данные из файла
+    loadFromFile(fileName);
 
-    HashTable ht;
-    ht.initialize();
+    // Если есть запрос, обработаем его
+    if (!query.empty()) {
+        ofstream outputFile("output.txt", ios::app);
+        processQuery(query, outputFile);
+        outputFile.close();
 
-    CompleteBinaryTree tree;
-    tree.initialize();
-
-    // Обработка файла с командами
-    processFile(argv[1], array, list, dlist, stack, queue, ht, tree);
-
-    // Очистка памяти перед завершением
-    array.cleanup();
-    list.cleanup();
-    dlist.cleanup();
-    stack.cleanup();
-    queue.cleanup();
-    ht.cleanup();
-    tree.cleanup();
+        // Сохраняем изменения в файл данных
+        saveToFile(fileName);
+    } else {
+        // Если нет параметра --query, переходим в интерактивный режим
+        cout << "Enter commands (type 'exit' to quit):" << endl;
+        ofstream outputFile("output.txt", ios::app);
+        while (true) {
+            cout << "> ";
+            getline(cin, query);
+            if (query == "exit") break;
+            processQuery(query, outputFile);
+            saveToFile(fileName);
+        }
+        outputFile.close();
+    }
 
     return 0;
 }
+

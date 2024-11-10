@@ -1,0 +1,21 @@
+Inserted 70 into tree myTree
+Inserted 70 into tree myTree
+Inserted 30 into tree myTree
+Inserted 40 into tree myTree
+Deleted 30 from tree myTree
+Value 30 not found in tree myTree
+Value 40 found in tree myTree
+Inserted 90 into tree myTree
+Value 79 not found in tree myTree
+Value 70 not found in tree myTree
+Inserted 70 into tree myTree
+Value 70 found in tree myTree
+Added 15 to stack myStack
+Set key key1 with value value1 in hash table HTable
+Set key key1 with value value1 in hash table myHashTable
+Inserted 10 into tree Tree
+Inserted 20 into tree Tree
+Inserted 30 into tree Tree
+Added 10 to queue queue
+Added 16 to queue queue
+Popped from queue queue
