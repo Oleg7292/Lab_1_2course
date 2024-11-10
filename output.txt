@@ -25,3 +25,8 @@ Inserted 60 into tree Tree
 Deleted 30 from tree Tree
 Complete is 1Deleted 60 from tree Tree
 Complete is 1Inserted 1701147252 into tree Tree
+Set key key1 with value Bam in hash table HT
+Set key key1 with value Mab in hash table HT
+Value for key key1 in hash table HT: Mab
+Added value 123 to key key1 in hash table HT
+Values for key key1 in hash table HT: Mab, 123

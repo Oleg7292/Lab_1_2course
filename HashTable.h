@@ -7,10 +7,22 @@
 
 using namespace std;
 
+struct ValueNode {
+    string value;
+    ValueNode* next;
+
+    ValueNode(const string& val) : value(val), next(nullptr) {}
+};
+
 struct HashNode {
     string key;
-    string value;
+    ValueNode* values;  // Указатель на начало списка значений для ключа
     HashNode* next;
+
+    HashNode(const string& k, const string& val)
+        : key(k), next(nullptr) {
+        values = new ValueNode(val);  // Инициализируем список значений первым элементом
+    }
 };
 
 struct HashTable {

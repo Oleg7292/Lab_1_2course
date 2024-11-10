@@ -24,37 +24,54 @@ int HashTable::hashFunction(const string& key) {
     return hash % size;
 }
 
-void HashTable::insert(const string& key, const string& value) {
+void HashTable::insert(const std::string& key, const std::string& value) {
     int index = hashFunction(key);
     HashNode* temp = table[index];
 
     while (temp != nullptr) {
         if (temp->key == key) {
-            temp->value = value;  // Обновление значения
+            // Добавляем новое значение в конец списка значений для существующего ключа
+            ValueNode* valNode = temp->values;
+            while (valNode->next != nullptr) {
+                valNode = valNode->next;
+            }
+            valNode->next = new ValueNode(value);  // Добавляем новое значение в конец списка
             return;
         }
         temp = temp->next;
     }
 
-    HashNode* newNode = new HashNode{key, value, table[index]};
+    // Если ключ не найден, создаем новый узел с этим ключом и значением
+    HashNode* newNode = new HashNode(key, value);
+    newNode->next = table[index];
     table[index] = newNode;  // Вставка в начало списка
 }
 
-string HashTable::get(const string& key) {
+std::string HashTable::get(const std::string& key) {
     int index = hashFunction(key);
     HashNode* temp = table[index];
 
     while (temp != nullptr) {
         if (temp->key == key) {
-            return temp->value;
+            // Собираем все значения в одну строку, разделяя запятыми
+            std::string result;
+            ValueNode* valNode = temp->values;
+            while (valNode != nullptr) {
+                if (!result.empty()) {
+                    result += ", ";
+                }
+                result += valNode->value;
+                valNode = valNode->next;
+            }
+            return result;
         }
         temp = temp->next;
     }
 
-    throw out_of_range("Key not found");
+    throw std::out_of_range("Key not found");
 }
 
-void HashTable::remove(const string& key) {
+void HashTable::remove(const std::string& key) {
     int index = hashFunction(key);
     HashNode* temp = table[index];
     HashNode* prev = nullptr;
@@ -65,10 +82,19 @@ void HashTable::remove(const string& key) {
     }
 
     if (temp == nullptr) {
-        cerr << "Key not foundn";
+        std::cerr << "Key not found" << std::endl;
         return;
     }
 
+    // Удаляем все значения, связанные с ключом
+    ValueNode* valNode = temp->values;
+    while (valNode != nullptr) {
+        ValueNode* toDelete = valNode;
+        valNode = valNode->next;
+        delete toDelete;
+    }
+
+    // Удаляем узел ключа
     if (prev == nullptr) {
         table[index] = temp->next;
     } else {

@@ -145,17 +145,22 @@ void saveToFile(const string& fileName) {
             }
             outputFile << endl;
         }
-        if (!hashTableNames[i].empty()) {
+      if (!hashTableNames[i].empty()) {
             outputFile << "hashtable " << hashTableNames[i];
             for (int j = 0; j < hashTables[i]->size; ++j) {
                 HashNode* node = hashTables[i]->table[j];
                 while (node != nullptr) {
-                    outputFile << " " << node->key << "=" << node->value;
-                    node = node->next;
-                }
+                    ValueNode* valNode = node->values;
+                // Для каждого значения, связанного с данным ключом
+                while (valNode != nullptr) {
+                    outputFile << " " << node->key << "=" << valNode->value;
+                    valNode = valNode->next;
             }
-            outputFile << endl;
+            node = node->next;
         }
+    }
+    outputFile << endl;
+}
         if (!arrayNames[i].empty()) {
             outputFile << "array " << arrayNames[i];
             for (size_t j = 0; j < arrays[i]->length; ++j) {
@@ -234,29 +239,29 @@ void processQuery(const string& query, ofstream& outputFile) {
         outputFile << "Popped from queue " << name << endl;
 
     } else if (operation == "HSET") {
-        string key, value;
-        iss >> key >> value;
-        int idx = findOrCreate(hashTableNames, hashTables, name);
-        hashTables[idx]->insert(key, value);
-        outputFile << "Set key " << key << " with value " << value << " in hash table " << name << endl;
+    string key, value;
+    iss >> key >> value;
+    int idx = findOrCreate(hashTableNames, hashTables, name);
+    hashTables[idx]->insert(key, value);
+    outputFile << "Added value " << value << " to key " << key << " in hash table " << name << endl;
 
     } else if (operation == "HGET") {
-        string key;
-        iss >> key;
-        int idx = findOrCreate(hashTableNames, hashTables, name);
-        try {
-            string value = hashTables[idx]->get(key);
-            outputFile << "Value for key " << key << " in hash table " << name << ": " << value << endl;
-        } catch (const out_of_range&) {
-            outputFile << "Key " << key << " not found in hash table " << name << endl;
-        }
+    string key;
+    iss >> key;
+    int idx = findOrCreate(hashTableNames, hashTables, name);
+    try {
+        string values = hashTables[idx]->get(key);  // Получаем строку со всеми значениями
+        outputFile << "Values for key " << key << " in hash table " << name << ": " << values << endl;
+    } catch (const out_of_range&) {
+        outputFile << "Key " << key << " not found in hash table " << name << endl;
+    }
 
     } else if (operation == "HDEL") {
-        string key;
-        iss >> key;
-        int idx = findOrCreate(hashTableNames, hashTables, name);
-        hashTables[idx]->remove(key);
-        outputFile << "Deleted key " << key << " from hash table " << name << endl;
+    string key;
+    iss >> key;
+    int idx = findOrCreate(hashTableNames, hashTables, name);
+    hashTables[idx]->remove(key);
+    outputFile << "Deleted all values for key " << key << " from hash table " << name << endl;
 
     } else if (operation == "MPUSH") {
         string value;
