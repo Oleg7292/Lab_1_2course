@@ -30,3 +30,47 @@ Set key key1 with value Mab in hash table HT
 Value for key key1 in hash table HT: Mab
 Added value 123 to key key1 in hash table HT
 Values for key key1 in hash table HT: Mab, 123
+Added 1 to array Array
+Added 5 to array Array
+Added 2 to array Array
+Added 3 to array Array
+Added 4 to array Array
+Inserted 21 at index 3 in array Array
+Set element at index 3 to 7 in array Array
+Inserted 31 at index 1 in array Array
+Set element at index 1 to 67 in array Array
+Array element at index 3: 2
+Deleted element at index 3 from array Array
+Array element at index 3: 7
+Added 3 to linked list LLIST
+Removed element from the back of list LLIST
+Added 3 to linked list LLIST
+Values for key key1 in hash table HT: Mab, 123
+Inserted 56 into tree Tree
+Value 56 found in tree Tree
+Deleted 56 from tree Tree
+Complete is true
+Inserted 8 into tree Tree
+Inserted 3 into tree Tree
+Inserted 10 into tree Tree
+Inserted 1 into tree Tree
+Inserted 6 into tree Tree
+Inserted 9 into tree Tree
+Deleted 9 from tree Tree
+Complete is true
+Inserted 14 into tree Tree
+Inserted 13 into tree Tree
+Deleted 13 from tree Tree
+Complete is false
+Tree Tree is complete
+Inserted 8 into tree Tree
+Inserted 3 into tree Tree
+Inserted 10 into tree Tree
+Inserted 6 into tree Tree
+Tree Tree is complete
+Inserted 14 into tree Tree
+Tree Tree is not complete
+Added value 5 to key key1 in hash table HT
+Added value 10 to key 1key in hash table HT
+Values for key 1key in hash table HT: 10
+Values for key 1key in hash table HT: 10

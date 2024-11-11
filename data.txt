@@ -1,4 +1,6 @@
 queue queue 16
 hashtable myHashTable key1=value1
-tree Tree 10 20 30 10
-hashtable HT key1=Mab key1=123
+array Array 1 67 5 7 3 4
+linkedlist LLIST 3
+tree Tree 8 3 10 1 6 14
+hashtable HT 1key=10 key1=5

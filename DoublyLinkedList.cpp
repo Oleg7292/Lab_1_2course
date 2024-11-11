@@ -60,6 +60,45 @@ void DoublyLinkedList::remove(const string& value) {
     delete temp;
 }
 
+void DoublyLinkedList::remove_front() {
+    if (!head) return;
+
+    DoublyNode* toDelete = head;
+    head = head->next;
+    
+    if (head) {
+        head->prev = nullptr;
+    } else {
+        tail = nullptr;  // Если список стал пустым
+    }
+    
+    delete toDelete;
+}
+
+void DoublyLinkedList::remove_back() {
+    if (!tail) return;
+
+    DoublyNode* toDelete = tail;
+    tail = tail->prev;
+    
+    if (tail) {
+        tail->next = nullptr;
+    } else {
+        head = nullptr;  // Если список стал пустым
+    }
+    
+    delete toDelete;
+}
+
+bool DoublyLinkedList::find(const string& value) const {
+    DoublyNode* temp = head;
+    while (temp) {
+        if (temp->data == value) return true;
+        temp = temp->next;
+    }
+    return false;
+}
+
 void DoublyLinkedList::cleanup() {
     while (head) {
         DoublyNode* toDelete = head;

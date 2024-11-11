@@ -9,7 +9,7 @@
 #include "Stack.h"
 #include "Queue.h"
 #include "HashTable.h"
-#include "CompleteBinaryTree.h"  // Подключаем заголовок полного бинарного дерева
+#include "CompleteBinaryTree.h" 
 
 using namespace std;
 
@@ -238,6 +238,15 @@ void processQuery(const string& query, ofstream& outputFile) {
         queues[idx]->pop();
         outputFile << "Popped from queue " << name << endl;
 
+    } else if (operation == "QPEEK") {
+    int idx = findOrCreate(queueNames, queues, name);
+    try {
+        string value = queues[idx]->front_elem();
+        outputFile << "Front element in queue " << name << ": " << value << endl;
+    } catch (const std::out_of_range&) {
+        outputFile << "Queue " << name << " is empty" << endl;
+    }
+
     } else if (operation == "HSET") {
     string key, value;
     iss >> key >> value;
@@ -288,7 +297,37 @@ void processQuery(const string& query, ofstream& outputFile) {
         arrays[idx]->removeAt(index);
         outputFile << "Deleted element at index " << index << " from array " << name << endl;
 
-    } else if (operation == "LLPUSH") {
+    } else if (operation == "MINSERT") {
+        size_t index;
+        string value;
+        iss >> index >> value;
+        int idx = findOrCreate(arrayNames, arrays, name);
+        try {
+            arrays[idx]->insertAt(index, value);
+            outputFile << "Inserted " << value << " at index " << index << " in array " << name << endl;
+            } catch (const out_of_range&) {
+        outputFile << "Index out of range for array " << name << endl;
+        }
+
+    } else if (operation == "MSET") {
+        size_t index;
+        string value;
+        iss >> index >> value;
+        int idx = findOrCreate(arrayNames, arrays, name);
+        try {
+            arrays[idx]->setAt(index, value);
+            outputFile << "Set element at index " << index << " to " << value << " in array " << name << endl;
+        } catch (const out_of_range&) {
+            outputFile << "Index out of range for array " << name << endl;
+        }
+    } else if (operation == "LLPUSH_FRONT") {
+        string value;
+        iss >> value;
+        int idx = findOrCreate(linkedListNames, linkedLists, name);
+        linkedLists[idx]->push_front(value);
+        outputFile << "Added " << value << " to linked list " << name << endl;
+ 
+    } else if (operation == "LLPUSH_BACK") {
         string value;
         iss >> value;
         int idx = findOrCreate(linkedListNames, linkedLists, name);
@@ -302,7 +341,24 @@ void processQuery(const string& query, ofstream& outputFile) {
         linkedLists[idx]->remove(value);
         outputFile << "Removed " << value << " from linked list " << name << endl;
 
-    } else if (operation == "DLADD_FRONT") {
+    } else if (operation == "LREMOVE_FRONT") {
+    int idx = findOrCreate(linkedListNames, linkedLists, name);
+    linkedLists[idx]->remove_front();
+    outputFile << "Removed element from the front of list " << name << endl;
+
+} else if (operation == "LREMOVE_BACK") {
+    int idx = findOrCreate(linkedListNames, linkedLists, name);
+    linkedLists[idx]->remove_back();
+    outputFile << "Removed element from the back of list " << name << endl;
+
+} else if (operation == "LFIND") {
+    string value;
+    iss >> value;
+    int idx = findOrCreate(linkedListNames, linkedLists, name);
+    bool found = linkedLists[idx]->find(value);
+    outputFile << "Element " << value << " in list " << name << " is " << (found ? "found" : "not found") << endl;
+
+} else if (operation == "DLADD_FRONT") {
         string value;
         iss >> value;
         int idx = findOrCreate(doublyLinkedListNames, doublyLinkedLists, name);
@@ -323,7 +379,24 @@ void processQuery(const string& query, ofstream& outputFile) {
         doublyLinkedLists[idx]->remove(value);
         outputFile << "Removed " << value << " from doubly linked list " << name << endl;
 
-    } else if (operation == "TINSERT") {
+    }else if (operation == "DLREMOVE_FRONT") {
+    int idx = findOrCreate(doublyLinkedListNames, doublyLinkedLists, name);
+    doublyLinkedLists[idx]->remove_front();
+    outputFile << "Removed element from the front of list " << name << endl;
+
+} else if (operation == "DLREMOVE_BACK") {
+    int idx = findOrCreate(doublyLinkedListNames, doublyLinkedLists, name);
+    doublyLinkedLists[idx]->remove_back();
+    outputFile << "Removed element from the back of list " << name << endl;
+
+} else if (operation == "DLFIND") {
+    string value;
+    iss >> value;
+    int idx = findOrCreate(doublyLinkedListNames, doublyLinkedLists, name);
+    bool found = doublyLinkedLists[idx]->find(value);
+    outputFile << "Element " << value << " in list " << name << " is " << (found ? "found" : "not found") << endl;
+
+} else if (operation == "TINSERT") {
         int value;
         iss >> value;
         
@@ -343,8 +416,14 @@ void processQuery(const string& query, ofstream& outputFile) {
         int value;
         iss >> value;
         int idx = findOrCreate(treeNames, trees, name);
+
+    // Удаляем узел с заданным значением
         remove(trees[idx], value);
-        outputFile << "Deleted " << value << " from tree " << name << endl << "Complete is " << isComplete(trees[idx]) << endl;
+
+    // Проверяем, является ли дерево полным
+        bool complete = isComplete(trees[idx]);
+        outputFile << "Deleted " << value << " from tree " << name << endl;
+        outputFile << "Complete is " << (complete ? "true" : "false") << endl;
 
     } else if (operation == "TGET") {
         int value;
@@ -356,7 +435,11 @@ void processQuery(const string& query, ofstream& outputFile) {
         } else {
             outputFile << "Value " << value << " not found in tree " << name << endl;
         }
-    }
+    } else if (operation == "TCOMPLETE") {
+        int idx = findOrCreate(treeNames, trees, name);
+        bool complete = isComplete(trees[idx]);
+        outputFile << "Tree " << name << (complete ? " is complete" : " is not complete") << endl;
+}
 }
 
 // Основная функция

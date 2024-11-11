@@ -30,12 +30,18 @@ void HashTable::insert(const std::string& key, const std::string& value) {
 
     while (temp != nullptr) {
         if (temp->key == key) {
-            // Добавляем новое значение в конец списка значений для существующего ключа
-            ValueNode* valNode = temp->values;
-            while (valNode->next != nullptr) {
-                valNode = valNode->next;
+            // Заменяем все значения для данного ключа на новое значение
+            ValueNode* oldValues = temp->values;
+            
+            // Очищаем старые значения
+            while (oldValues != nullptr) {
+                ValueNode* toDelete = oldValues;
+                oldValues = oldValues->next;
+                delete toDelete;
             }
-            valNode->next = new ValueNode(value);  // Добавляем новое значение в конец списка
+
+            // Устанавливаем новое значение
+            temp->values = new ValueNode(value);
             return;
         }
         temp = temp->next;

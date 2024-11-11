@@ -16,6 +16,8 @@ struct Array {
     void add(const string& value);
     string get(size_t index) const;
     void removeAt(size_t index);
+    void insertAt(size_t index, const string& value);
+    void setAt(size_t index, const string& value);
     void cleanup();
 };
 

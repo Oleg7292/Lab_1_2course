@@ -19,6 +19,9 @@ struct DoublyLinkedList {
     void push_front(const string& value);
     void push_back(const string& value);
     void remove(const string& value);
+    void remove_front();
+    void remove_back();
+    bool find(const string& value) const;
     void cleanup();
 };
 

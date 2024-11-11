@@ -44,6 +44,27 @@ void Array::removeAt(size_t index) {
     length--;
 }
 
+void Array::insertAt(size_t index, const string& value) {
+    if (index > length) {
+        throw out_of_range("Index out of range");
+    }
+    if (length >= capacity) {
+        resize();
+    }
+    for (size_t i = length; i > index; --i) {
+        data[i] = data[i - 1];
+    }
+    data[index] = value;
+    length++;
+}
+
+void Array::setAt(size_t index, const string& value) {
+    if (index >= length) {
+        throw out_of_range("Index out of range");
+    }
+    data[index] = value;
+}
+
 void Array::cleanup() {
     delete[] data;
 }

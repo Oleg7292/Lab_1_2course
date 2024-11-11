@@ -53,29 +53,10 @@ void insert(CompleteBinaryTree*& root, int value) {
         return;
     }
 
-    Queue<CompleteBinaryTree*> q;
-    q.initialize();
-    q.push(root);
-
-    while (!q.is_empty()) {
-        CompleteBinaryTree* temp = q.front_elem();
-        q.pop();
-
-        if (temp->left == nullptr) {
-            temp->left = new CompleteBinaryTree(value);
-            q.cleanup();
-            return;
-        } else {
-            q.push(temp->left);
-        }
-
-        if (temp->right == nullptr) {
-            temp->right = new CompleteBinaryTree(value);
-            q.cleanup();
-            return;
-        } else {
-            q.push(temp->right);
-        }
+    if (value < root->value) {
+        insert(root->left, value);  // Рекурсивный вызов для левого поддерева
+    } else {
+        insert(root->right, value);  // Рекурсивный вызов для правого поддерева
     }
 }
 
